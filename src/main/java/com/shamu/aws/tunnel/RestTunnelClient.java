@@ -10,35 +10,37 @@ import com.shamu.aws.sqs.Queue;
 
 /**
  * base class for both tunnel Endpoints,Sender and Receiver
+ * 
  * @author kalron
  */
 public abstract class RestTunnelClient {
 
 	ExecutorService executer = Executors.newFixedThreadPool(5);
 
-	//SQS queue for requests
+	// SQS queue for requests
 	Queue queue_requests;
-	
-	//SQS queue for responses
+
+	// SQS queue for responses
 	Queue queue_responses;
 
 	private boolean listenning;
-	
+
 	Gson json = new Gson();
-	
+
 	RestTunnelClient(Queue queue_requests, Queue queue_responses) {
 		super();
 		this.queue_requests = queue_requests;
 		this.queue_responses = queue_responses;
 	}
 
-	protected void listen(final Queue queue,final QueueListener listener) throws Exception {
+	protected void listen(final Queue queue, final QueueListener listener)
+			throws Exception {
 		listenning = true;
 		// because SQS is a distributed system, we need to poll until we get the
 		// message
-		Thread reader = new Thread(queue.getQueueEndpoint()+ " reader") {
+		Thread reader = new Thread(queue.getQueueEndpoint() + " reader") {
 			public void run() {
-				try{
+				try {
 					while (listenning) {
 						try {
 							List<Message> msgs = queue.receiveMessage(1, 20);
@@ -53,10 +55,9 @@ public abstract class RestTunnelClient {
 						} catch (Exception exp) {
 							exp.printStackTrace();
 						}
-	
+
 					}
-				}
-				catch(Exception exp){
+				} catch (Exception exp) {
 					exp.printStackTrace();
 				}
 			}
@@ -69,7 +70,8 @@ public abstract class RestTunnelClient {
 		listenning = false;
 	}
 
-	private void notifyListener(final String message,final QueueListener listener) {
+	private void notifyListener(final String message,
+			final QueueListener listener) {
 		Runnable r = new Runnable() {
 			public void run() {
 				listener.onMessageReceived(message);
@@ -91,7 +93,8 @@ public abstract class RestTunnelClient {
 		executer.execute(r);
 	}
 
-	protected void writeMessage(final Queue queue, final String json) throws Exception {
+	protected void writeMessage(final Queue queue, final String json)
+			throws Exception {
 		Runnable r = new Runnable() {
 			public void run() {
 				try {
@@ -103,9 +106,9 @@ public abstract class RestTunnelClient {
 		};
 		executer.execute(r);
 	};
-	
+
 	interface QueueListener {
-		
+
 		public void onMessageReceived(String message);
 
 	}

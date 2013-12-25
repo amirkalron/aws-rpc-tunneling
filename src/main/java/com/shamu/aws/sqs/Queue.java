@@ -21,64 +21,70 @@ public class Queue {
 
 	private AmazonSQSClient sqs;
 	private String queueEndpoint;
-    
-    public Queue(String queueEndpoint,AmazonSQSClient sqs) {
-        this.queueEndpoint = queueEndpoint;
-        this.sqs = sqs;
-    }
 
-    public String getQueueEndpoint() {
-        return queueEndpoint;
-    }
+	public Queue(String queueEndpoint, AmazonSQSClient sqs) {
+		this.queueEndpoint = queueEndpoint;
+		this.sqs = sqs;
+	}
 
-    public static Queue createQueue(String name) throws Exception {
-    	
-    	Properties prop = new Properties();
-    	prop.load(Queue.class.getClassLoader().getResourceAsStream(RestTunnel.AWS_PROP_FILE));
-    	
-    	String accessKey=prop.getProperty("accessKey");
-    	String secretKey=prop.getProperty("secretKey"); 
-    	
-    	AWSCredentials cridentials = new BasicAWSCredentials(accessKey, secretKey);
-    	
-    	ClientConfiguration config = new ClientConfiguration();
-    	String proxyHost = prop.getProperty("http.proxyHost");
-    	String proxyPort = prop.getProperty("http.proxyPort");
-    	if(proxyHost!=null && proxyPort!=null){
-    		config.setProxyHost(proxyHost);
-    		config.setProxyPort(Integer.parseInt(proxyPort));
-    	}
-    	
-    	AmazonSQSClient sqs = new AmazonSQSClient(cridentials,config);
-    	
-    	CreateQueueRequest createQueueRequest = new CreateQueueRequest(name);
-        String myQueueUrl = sqs.createQueue(createQueueRequest).getQueueUrl();
-        Queue q = new Queue(myQueueUrl,sqs); 
-        
-        
-        //I want a default polling time of 20 seconds by default
-        Map<String,String> atrributes = new HashMap<String, String>();
-        atrributes.put("ReceiveMessageWaitTimeSeconds","20");
-        q.setQueueAttributes(atrributes);
-        return q;
-    }
+	public String getQueueEndpoint() {
+		return queueEndpoint;
+	}
 
-    public void setQueueAttributes(Map<String,String> attributes) throws Exception {
-    	sqs.setQueueAttributes(  new SetQueueAttributesRequest(queueEndpoint, attributes) );
-    }
-    
-    public void sendMessage(String messageBody) throws Exception {
-    	sqs.sendMessage(new SendMessageRequest(queueEndpoint, messageBody));
-    }
-    
-    public List<Message> receiveMessage(int numMessages,long pollTimeSeconds) throws Exception {
-    	ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueEndpoint);
-        List<Message> messages = sqs.receiveMessage(receiveMessageRequest).getMessages(); 
-        return messages;
-    }
-    
-    public void deleteMessage(String receiptHandle) throws Exception {
-    	sqs.deleteMessage(new DeleteMessageRequest(queueEndpoint, receiptHandle));
-    }    
+	public static Queue createQueue(String name) throws Exception {
+
+		Properties prop = new Properties();
+		prop.load(Queue.class.getClassLoader().getResourceAsStream(
+				RestTunnel.AWS_PROP_FILE));
+
+		String accessKey = prop.getProperty("accessKey");
+		String secretKey = prop.getProperty("secretKey");
+
+		AWSCredentials cridentials = new BasicAWSCredentials(accessKey,
+				secretKey);
+
+		ClientConfiguration config = new ClientConfiguration();
+		String proxyHost = prop.getProperty("http.proxyHost");
+		String proxyPort = prop.getProperty("http.proxyPort");
+		if (proxyHost != null && proxyPort != null) {
+			config.setProxyHost(proxyHost);
+			config.setProxyPort(Integer.parseInt(proxyPort));
+		}
+
+		AmazonSQSClient sqs = new AmazonSQSClient(cridentials, config);
+
+		CreateQueueRequest createQueueRequest = new CreateQueueRequest(name);
+		String myQueueUrl = sqs.createQueue(createQueueRequest).getQueueUrl();
+		Queue q = new Queue(myQueueUrl, sqs);
+
+		// I want a default polling time of 20 seconds by default
+		Map<String, String> atrributes = new HashMap<String, String>();
+		atrributes.put("ReceiveMessageWaitTimeSeconds", "20");
+		q.setQueueAttributes(atrributes);
+		return q;
+	}
+
+	public void setQueueAttributes(Map<String, String> attributes)
+			throws Exception {
+		sqs.setQueueAttributes(new SetQueueAttributesRequest(queueEndpoint,
+				attributes));
+	}
+
+	public void sendMessage(String messageBody) throws Exception {
+		sqs.sendMessage(new SendMessageRequest(queueEndpoint, messageBody));
+	}
+
+	public List<Message> receiveMessage(int numMessages, long pollTimeSeconds)
+			throws Exception {
+		ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(
+				queueEndpoint);
+		List<Message> messages = sqs.receiveMessage(receiveMessageRequest)
+				.getMessages();
+		return messages;
+	}
+
+	public void deleteMessage(String receiptHandle) throws Exception {
+		sqs.deleteMessage(new DeleteMessageRequest(queueEndpoint, receiptHandle));
+	}
 
 }
