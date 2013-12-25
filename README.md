@@ -2,7 +2,7 @@
 
 
 ## What is it?
-The common solution to enable RPC call behind firewall\proxy is to use SSH tunneling.
+The common solution to enable RPC calls behind firewall\proxy is to use SSH tunneling.
 
 ##### What Are SSH  disadvantages?
 - P2P architecture,not suitubale for common cloud multi machine architecture.
@@ -21,7 +21,7 @@ A tunnel object is created on the AWS platform,via SQS service,where producer\co
  
 ## How to start?
 
-In aws.properties key,set cridentials and proxy settings ( optional)
+In **aws.properties**‎ file,set cridentials and proxy settings ( optional)
 
 then,go to RestTunnelTest to view the example
 
