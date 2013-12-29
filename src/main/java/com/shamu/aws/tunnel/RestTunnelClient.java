@@ -10,7 +10,6 @@ import com.shamu.aws.sqs.Queue;
 
 /**
  * base class for both tunnel Endpoints,Sender and Receiver
- * 
  * @author kalron
  */
 public abstract class RestTunnelClient {
@@ -36,8 +35,7 @@ public abstract class RestTunnelClient {
 	protected void listen(final Queue queue, final QueueListener listener)
 			throws Exception {
 		listenning = true;
-		// because SQS is a distributed system, we need to poll until we get the
-		// message
+		// because SQS is a distributed system, we need to poll until we get the message
 		Thread reader = new Thread(queue.getQueueEndpoint() + " reader") {
 			public void run() {
 				try {
